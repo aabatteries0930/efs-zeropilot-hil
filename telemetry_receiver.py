@@ -24,3 +24,9 @@ def to_packet(msg):
 
 def open_telemetry_link(port = SERIAL_PORT, baud = BAUD):
     return mavutil.mavlink_connection(port, baud = baud)
+
+def next_packet(conn):
+    msg = conn.recv_match(blocking = True)
+    if msg is None:
+        return None
+    return to_packet(msg)
