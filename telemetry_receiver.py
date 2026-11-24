@@ -22,15 +22,18 @@ def to_packet(msg):
     }
     return packet
 
+# opens up connection and returns its info
 def open_telemetry_link(port = SERIAL_PORT, baud = BAUD):
     return mavutil.mavlink_connection(port, baud = baud)
 
+# uses connection info to fetch next packet w/ pymavlink library thingy
 def next_packet(conn):
     msg = conn.recv_match(blocking = True)
     if msg is None:
         return None
     return to_packet(msg)
 
+# for now this only prints the packet but later will jsut return a value
 def main():
     conn = open_telemetry_link()
     print("Waitin for telemetry...")
