@@ -30,3 +30,14 @@ def next_packet(conn):
     if msg is None:
         return None
     return to_packet(msg)
+
+def main():
+    conn = open_telemetry_link()
+    print("Waitin for telemetry...")
+    while True:
+        packet = next_packet(conn)
+        if packet is None:
+            continue
+        print(packet)
+if __name__ == "__main__":
+    main()
