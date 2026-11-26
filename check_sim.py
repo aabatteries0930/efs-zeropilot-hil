@@ -60,25 +60,20 @@ def gps_rows(tm, s):
             rows.append(("cog", tm["cog"], s["hdg"], ang_diff(tm["cog"], s["hdg"]), TOL["cog_deg"], "deg"))
     return rows
 
-
 def servo_rows(norms, s):
     return [(f"servo {name}", norms[i], s["ctrl"][i], abs(norms[i] - s["ctrl"][i]), TOL["servo_norm"], "")
             for i, name in enumerate(PWM_CHANNEL_NAMES)]
 
-
 def all_pass(rows):
     return all(diff <= tol for _, _, _, diff, tol, _ in rows)
-
 
 def find_matches(samples, t_rx, lookback_s, rows_fn, tm):
     window = [(t_rx - t, s) for t, s in samples if t_rx - t <= lookback_s]
     matches = [(lag, s) for lag, s in window if all_pass(rows_fn(tm, s))]
     return window, matches
 
-
 def nearest(window, lag_target):
     return min(window, key=lambda m: abs(m[0] - lag_target))
-
 
 def check(pkt, t_rx):
     kind, field = pkt["type"], pkt["fields"]
