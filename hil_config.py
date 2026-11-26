@@ -19,6 +19,8 @@ PWM_TARGET_IP = UDP_HOST
 HOST_IP = UDP_HOST
 HOST_PORT = JSBSIM_CONTROL_PORT
 
+# Telemetry checker receives the JSBSim state here
+CHECK_PORT = 18003
 
 SERIAL_PORT = "/dev/ttyACM0"
 PI_ESP32_BAUD = 115200
@@ -43,6 +45,32 @@ SERVO_MAX_US = 2000
 DEFAULT_LAT_DEG = 43.4723  # waterloo, used as JSBSim's initial position and the ESP32's default
 DEFAULT_LON_DEG = -80.5449
 
+EXPECTED_MAV_TYPE = 1        # MAV_TYPE_FIXED_WING
+EXPECTED_AUTOPILOT = 3       # MAV_AUTOPILOT_ARDUPIL
+
+CHECK_FORMAT = ">11d"
+CHECK_TOLERANCE = {
+    "lat_m": 5.0, "lon_m": 5.0, "alt_m": 5.0,
+    "vel_ms": 2.0, "cog_deg": 10.0,
+    "servo_norm": 0.05, "batt_mv": 100, "batt_ca": 20,
+}
+
+LAG_MIN_S = 0.2 #placeholder range values, not sure where to find the lag values?
+LAG_MAX_S = 1.0
+LAG_SEARCH_S = 3.0
+
+HB_MIN_S, HB_MAX_S = 0.5, 2.0 
+ESP32_VOLT = 12.4 #got this from hil_esp32.ino
+ESP32_CURRENT = 1.8 #same here
+
+TM_GPS = "GPS_RAW_INT"
+TM_BATTERY = "BATTERY_STATUS"
+TM_SERVO = "SERVO_OUTPUT_RAW"
+TM_HEARTBEAT = "HEARTBEAT"
+CHECK_TYPES = {TM_GPS, TM_BATTERY, TM_SERVO, TM_HEARTBEAT}
+
+PRINT_TYPES = {"ATTITUDE", "RAW_IMU", "SCALED_PRESSURE", "DISTANCE_SENSOR",
+    "RC_CHANNELS", "SYS_STATUS", "STATUSTEXT"}
 @dataclass
 class AircraftState:
     altitude_ft: float

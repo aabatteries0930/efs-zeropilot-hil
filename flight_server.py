@@ -6,13 +6,12 @@ import os
 from hil_config import AircraftState, JSBSIM_STATE_PORT, UDP_HOST
 from hil_config import JSBSIM_CONTROL_PORT, HOST_IP
 from hil_config import DEFAULT_LAT_DEG, DEFAULT_LON_DEG
-
+from hil_config import CHECK_PORT, CHECK_FORMAT 
 
 TARGET_IP = UDP_HOST;        TARGET_PORT = JSBSIM_STATE_PORT  # Send full AircraftState
 
 ROOT_DIR = "/home/pi/jsbsim_data" 
 AIRCRAFT = "c172x"
-
 
 fdm = jsbsim.FGFDMExec(ROOT_DIR)
 fdm.load_model(AIRCRAFT)
@@ -32,6 +31,8 @@ sock_in.bind((HOST_IP, JSBSIM_CONTROL_PORT))
 sock_in.setblocking(False)
 
 sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+sock_chk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 print(f"--- JSBSim SERVER RUNNING ---")
 print(f"Listening on {JSBSIM_CONTROL_PORT}")
@@ -71,6 +72,15 @@ try:
         
         packet = state.to_udp_payload()
         sock_out.sendto(packet, (TARGET_IP, TARGET_PORT))
+
+        chk_packet = struct.pack(CHECK_FORMAT,time.monotonic(),
+        fdm['position/h-sl-ft'],
+        fdm['velocities/vg-fps'],          # ground speed in ft/s, for GPS vel
+        fdm['position/lat-geod-deg'],
+        fdm['position/long-gc-deg'],
+        fdm['attitude/psi-deg'], *controls) 
+                                # 5 normalized controls, for SERVO_OUTPUT
+        sock_chk.sendto(chk_packet, (UDP_HOST, CHECK_PORT))
         
         time.sleep(0.01)
 
@@ -78,3 +88,4 @@ except KeyboardInterrupt:
     print("\nStopping...")
     sock_in.close()
     sock_out.close()
+    sock_chk.close()
