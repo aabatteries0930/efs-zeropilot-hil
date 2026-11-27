@@ -21,7 +21,6 @@ DEGREES_FIX = 1e7
 MILLI = 1000.0
 CENTI = 100.0
 M_PER_FT = 0.3048
-M_PER_S_PER_KT = 0.514444     
 UNKNOWN = 65535 #MAVLink's "no data" value
 
 def sim_listener():
@@ -30,10 +29,10 @@ def sim_listener():
     sock.bind((UDP_HOST, CHECK_PORT))
     while True:
         data, _ = sock.recvfrom(1024)
-        t, alt_ft, vc_kts, lat, lon, psi, *ctrl = struct.unpack(CHECK_FORMAT, data)
+        t, alt_ft, vc_ft, lat, lon, psi, *ctrl = struct.unpack(CHECK_FORMAT, data)
         with lock:
             sim_buf.append((t, {"alt": alt_ft * M_PER_FT, #ft to m
-                                "vel": vc_kts * M_PER_S_PER_KT, #kts to m/s
+                                "vel": vc_ft * M_PER_FT, #ft/s to m/s
                                 "lat": lat, "lon": lon, #degrees
                                 "hdg": psi, #degrees (yaw)
                                 "ctrl": ctrl})) #normalized controls
