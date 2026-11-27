@@ -24,7 +24,6 @@ M_PER_FT = 0.3048
 UNKNOWN = 65535 #MAVLink's "no data" value
 
 def sim_listener():
-    """Thread: receives sim packets from flight_server.py and stores them in SI units."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_HOST, CHECK_PORT))
     while True:
